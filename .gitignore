@@ -106,3 +106,4 @@ venv.bak/
 # exclude the dataset
 /fma_small
 /smallAllSongs
+*.csv
