@@ -107,3 +107,4 @@ venv.bak/
 /fma_small
 /smallAllSongs
 *.csv
+/.idea/

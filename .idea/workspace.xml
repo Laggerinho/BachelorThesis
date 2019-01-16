@@ -26,7 +26,7 @@
       <file leaf-file-name="GANTraining.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/GANTraining.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1725">
+            <state relative-caret-position="1365">
               <caret line="123" column="25" selection-start-line="123" selection-start-column="25" selection-end-line="123" selection-end-column="25" />
             </state>
           </provider>
@@ -321,7 +321,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="64" y="-11" width="1857" height="1092" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.19292426" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -716,7 +715,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/GANTraining.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1725">
+        <state relative-caret-position="1365">
           <caret line="123" column="25" selection-start-line="123" selection-start-column="25" selection-end-line="123" selection-end-column="25" />
         </state>
       </provider>
