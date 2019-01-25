@@ -30,7 +30,7 @@ print("Sample size in Seconds: ", sampleSize/44100.)
 discriminator = GANDiscriminator(disFirstFCSize).to(device)
 learningrate = 0.01
 fmaSmall = MusicDatasetFolder(root_path="smallAllSongs/", sampleSize=sampleSize)  #18
-dataloader = DataLoader(fmaSmall, batch_size=batchSize, num_workers=4, shuffle=True)
+dataloader = DataLoader(fmaSmall, batch_size=batchSize, num_workers=1, shuffle=True)
 targetReal = torch.zeros(batchSize, 2).to(device)
 targetReal[:, 0] = 1.
 targetFake = torch.zeros(batchSize, 2).to(device)
