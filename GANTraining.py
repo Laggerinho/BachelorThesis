@@ -13,7 +13,7 @@ import torchaudio
 import os
 
 device = torch.device('cuda')
-batchSize = 10
+batchSize = 1
 plot_values_real = []
 plot_values_fake = []
 cpu = torch.device('cpu')
