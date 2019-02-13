@@ -6,9 +6,9 @@ class GANDiscriminator(nn.Module):
 
     def __init__(self, firstLayer):
         super(GANDiscriminator, self).__init__()
-        self.conv1 = nn.Conv2d(1, 2, kernel_size=[1, 2048], stride=96)
-        self.conv2 = nn.Conv2d(2, 8, [1, 512], stride=48)
-        # self.conv3 = nn.Conv2d(16, 32, [1, 128], stride=12) # 64*128*128 + 128 number of parameters
+        self.conv1 = nn.Conv2d(1, 2, kernel_size=[1, 2048], stride=36)
+        self.conv2 = nn.Conv2d(2, 8, [1, 512], stride=18)
+        self.conv3 = nn.Conv2d(8, 16, [1, 128], stride=9) # 64*128*128 + 128 number of parameters
         # self.conv4 = nn.Conv2d(128, 256, [1, 512], stride=5)
         # self.conv5 = nn.Conv2d(256, 512, [1, 256], stride=3)
         # self.conv6 = nn.Conv2d(512, 1024, [1, 512], stride=2)
@@ -40,6 +40,6 @@ class GANDiscriminator(nn.Module):
     def getConvOutput(self, input):
         sample = F.leaky_relu(self.conv1(input))
         sample = F.leaky_relu(self.conv2(sample))
-        # sample = F.leaky_relu(self.conv3(sample))
+        sample = F.leaky_relu(self.conv3(sample))
         # print("shape after conv: ", sample.size())
         return sample.reshape(sample.size(0), -1)

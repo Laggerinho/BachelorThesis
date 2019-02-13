@@ -6,13 +6,16 @@ class GANGenerator(nn.Module):
 
     def __init__(self):
         super(GANGenerator, self).__init__()
-        self.tranConv1 = nn.ConvTranspose2d(1, 4, kernel_size=[32, 1], stride=1)
-        self.tranConv2 = nn.ConvTranspose2d(4, 16, kernel_size=[64, 1], stride=1)
-        self.tranConv3 = nn.ConvTranspose2d(16, 32, kernel_size=[128, 1], stride=1)
-        # self.tranConv4 = nn.ConvTranspose2d(1024, 2510, kernel_size=[4, 1], stride=1)
-        # self.tranConv5 = nn.ConvTranspose2d(256, 512, kernel_size=[6, 1], stride=1)
+        self.tranConv1 = nn.ConvTranspose2d(1, 4, kernel_size=[256, 1], stride=1)
+        self.tranConv2 = nn.ConvTranspose2d(4, 16, kernel_size=[512, 1], stride=1)
+        self.tranConv3 = nn.ConvTranspose2d(16, 32, kernel_size=[1024, 1], stride=1)
+        self.tranConv4 = nn.ConvTranspose2d(32, 46, kernel_size=[128, 1], stride=1)
+        # self.tranConv5 = nn.ConvTranspose2d(64, 128, kernel_size=[256, 1], stride=1)
         # self.tranConv6 = nn.ConvTranspose2d(512, 2450, kernel_size=[4, 1], stride=1)
         # self.tranConv7 = nn.ConvTranspose2d(1024, 1, kernel_size=[1, 1], stride=1)
+
+        # TODO: zwischenlayers einfügen, die mit Padding die selbe länge des input Vektors ausgeben und dafür die
+        # TODO: channels progressiv erhöhen.
 
         # print(self.tranConv1.stride[0])
         # print(self.tranConv1.stride[1])
@@ -32,11 +35,11 @@ class GANGenerator(nn.Module):
         # print(randVect.size())
         randVect = F.leaky_relu(self.tranConv2(randVect))
         # print(randVect.size())
-        randVect = self.tranConv3(randVect)
+        randVect = F.leaky_relu(self.tranConv3(randVect))
         # print(randVect.size())
-        # randVect = self.tranConv4(randVect)
+        randVect = F.leaky_relu(self.tranConv4(randVect))
         # print(randVect.size())
-        # randVect = F.leaky_relu(self.tranConv5(randVect))
+        # randVect = (self.tranConv5(randVect))
         # print(randVect.size())
         # randVect = self.tranConv6(randVect)
         # print(randVect.size())

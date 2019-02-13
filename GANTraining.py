@@ -27,6 +27,7 @@ discriminatorTest = GANDiscriminator(5).to(device)
 calculator = ParamCalulator(randomVectorSize=randVectSize, generator=generator, discriminator=discriminatorTest)
 sampleSize, disFirstFCSize = calculator.getParams()
 print("Sample size in Seconds: ", sampleSize/44100.)
+print("First Layer Disc: ", disFirstFCSize)
 discriminator = GANDiscriminator(disFirstFCSize).to(device)
 learningrate = 0.01
 fmaSmall = MusicDatasetFolder(root_path="smallAllSongs/", sampleSize=sampleSize)  #18
@@ -156,7 +157,7 @@ for numb_epo in range(10):
     geneMusic = generator(randVect)
     for i, vector in enumerate(geneMusic):
         print(vector)
-        torchaudio.save(str(boohoo) + str(numb_epo) + '/foo_save' + str(i) + '.mp3', vector.to(cpu), 44100)  # saves tensor to file
+        torchaudio.save('shuffle' + str(boohoo) + str(numb_epo) + '/foo_save' + str(i) + '.mp3', vector.to(cpu), 44100)  # saves tensor to file
     boohoo = not boohoo
 
     # print(batch.size())
