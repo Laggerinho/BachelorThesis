@@ -28,7 +28,7 @@ print(tocalc.size())
 # output = encoder(sound[None, None, :, None])
 # output = output[None, :, None]
 # output = output.view(1, 1, 9213, 1)
-# print("prä: ", output.size())
+# print("pra: ", output.size())
 # output = generator(output)
 
 # rand = torch.FloatTensor(1, 1, 9213, 1).normal_().to(device)
