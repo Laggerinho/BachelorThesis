@@ -45,7 +45,7 @@ dataset_test = GenericDataset(
     split=data_test_opt['split'],
     random_sized_crop=data_test_opt['random_sized_crop'])
 
-dloader_train = DataLoaderFE(
+dloader_train = DataLoader(
     dataset=dataset_train,
     batch_size=data_train_opt['batch_size'],
     unsupervised=data_train_opt['unsupervised'],
@@ -53,7 +53,7 @@ dloader_train = DataLoaderFE(
     num_workers=args_opt.num_workers,
     shuffle=True)
 
-dloader_test = DataLoaderFE(
+dloader_test = DataLoader(
     dataset=dataset_test,
     batch_size=data_test_opt['batch_size'],
     unsupervised=data_test_opt['unsupervised'],
