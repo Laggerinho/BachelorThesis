@@ -61,6 +61,24 @@ dloader_test = DataLoader(
     num_workers=args_opt.num_workers,
     shuffle=False)
 
+if (data_train_opt['fisheye'] if ('fisheye' in data_train_opt) else False):
+    print('do some fisheye computation in dataloader')
+    dloader_train = DataLoaderFE(
+        dataset=dataset_train,
+        batch_size=data_train_opt['batch_size'],
+        unsupervised=data_train_opt['unsupervised'],
+        epoch_size=data_train_opt['epoch_size'],
+        num_workers=args_opt.num_workers,
+        shuffle=True)
+
+    dloader_test = DataLoaderFE(
+        dataset=dataset_test,
+        batch_size=data_test_opt['batch_size'],
+        unsupervised=data_test_opt['unsupervised'],
+        epoch_size=data_test_opt['epoch_size'],
+        num_workers=args_opt.num_workers,
+        shuffle=False)
+
 config['disp_step'] = args_opt.disp_step
 algorithm = getattr(alg, config['algorithm_type'])(config)
 if args_opt.cuda: # enable cuda
