@@ -21,7 +21,7 @@ from pdb import set_trace as breakpoint
 
 # Set the paths of the datasets here.
 _CIFAR_DATASET_DIR = './datasets/CIFAR'
-_IMAGENET_DATASET_DIR = './datasets/IMAGENET/ILSVRC2012'
+_IMAGENET_DATASET_DIR = './data'
 _PLACES205_DATASET_DIR = './datasets/Places205'
 
 
@@ -354,12 +354,12 @@ class DataLoaderFE(object):
                     for a in xrange(img_size):
                         for b in xrange(img_size):
                             # print(b)
-                            x = 2. * (b / 255. - 0.5)
-                            y = 2. * (a / 255. - 0.5)
-                            z = 0.5
+                            x = 5. * (b / 255. - 0.5)
+                            y = 5. * (a / 255. - 0.5)
+                            z = 5.
 
-                            self.grid[0][a][b][0] = x / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.))
-                            self.grid[0][a][b][1] = y / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.))
+                            self.grid[0][a][b][0] = 2.*(x / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.)))
+                            self.grid[0][a][b][1] = 2.*(y / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.)))
 
                 rotated_imgs = [
                     self.transform(img0),
