@@ -4,6 +4,7 @@ import os
 import os.path
 import imp
 from tqdm import tqdm
+import time
 
 import torch
 import torch.nn as nn
@@ -13,12 +14,16 @@ import utils
 import datetime
 import logging
 
+from tensorboardX import SummaryWriter
 from pdb import set_trace as breakpoint
 
 class Algorithm():
     def __init__(self, opt):
         self.set_experiment_dir(opt['exp_dir'])
         self.set_log_file_handler()
+        localtime = time.asctime(time.localtime(time.time()))
+        self.writer = SummaryWriter(log_dir='runs/' + opt['exp_dir'] + ' ' + localtime)
+
 
         self.logger.info('Algorithm options %s' % opt)
         self.opt = opt
@@ -27,6 +32,10 @@ class Algorithm():
         self.allocate_tensors()
         self.curr_epoch = 0
         self.optimizers = {}
+        self.writer_train_run = 0
+        self.writer_train_log = 0
+        self.writer_eval_run = 0
+        self.writer_eval_log = 0
 
         self.keep_best_model_metric_name = opt['best_metric'] if ('best_metric' in opt) else None
 
@@ -242,6 +251,7 @@ class Algorithm():
                 self.logger.info('==> Evaluation stats: %s' % (eval_stats))
                 self.keep_record_of_best_model(eval_stats, self.curr_epoch)
 
+        self.writer.export_scalars_to_json("./all_scalars.json")
         self.print_eval_stats_of_best_model()
 
     def run_train_epoch(self, data_loader, epoch):
@@ -259,6 +269,11 @@ class Algorithm():
         for idx, batch in enumerate(tqdm(data_loader(epoch))):
             self.biter = idx
             train_stats_this = self.train_step(batch)
+            if (self.writer_train_run%100 == 0):
+                for record in train_stats_this:
+                    self.writer.add_scalar('data/' + record + ' train', train_stats_this[record], self.writer_train_log)
+                self.writer_train_log += 1
+            self.writer_train_run += 1
             train_stats.update(train_stats_this)
             if (idx+1) % disp_step == 0:
                 self.logger.info('==> Iteration [%3d][%4d / %4d]: %s' % (epoch+1, idx+1, len(data_loader), train_stats.average()))
@@ -279,6 +294,11 @@ class Algorithm():
         for idx, batch in enumerate(tqdm(dloader())):
             self.biter = idx
             eval_stats_this = self.evaluation_step(batch)
+            if (self.writer_eval_run % 25 == 0):
+                for record in eval_stats_this:
+                    self.writer.add_scalar('data/' + record + ' val', eval_stats_this[record], self.writer_eval_log)
+                self.writer_eval_log += 1
+            self.writer_eval_run += 1
             eval_stats.update(eval_stats_this)
 
         self.logger.info('==> Results: %s' % eval_stats.average())
