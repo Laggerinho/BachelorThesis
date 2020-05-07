@@ -10,6 +10,7 @@ data_train_opt['random_sized_crop'] = True
 data_train_opt['dataset_name'] = 'imagenet'
 data_train_opt['split'] = 'ILSVRC2012_img_train'
 
+
 data_test_opt = {}
 data_test_opt['batch_size'] = batch_size
 data_test_opt['unsupervised'] = True
