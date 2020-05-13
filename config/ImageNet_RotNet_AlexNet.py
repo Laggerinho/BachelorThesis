@@ -17,7 +17,7 @@ data_test_opt['unsupervised'] = True
 data_test_opt['epoch_size'] = None
 data_test_opt['random_sized_crop'] = False
 data_test_opt['dataset_name'] = 'imagenet'
-data_test_opt['split'] = 'ILSVRC2012_img_val'
+data_test_opt['split'] = 'val_folders/val'
 
 config['data_train_opt'] = data_train_opt
 config['data_test_opt']  = data_test_opt
