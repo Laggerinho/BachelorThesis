@@ -154,13 +154,13 @@ class Algorithm():
 
     def load_to_gpu(self):
         for key, net in self.networks.items():
-            self.networks[key] = net.cuda(1)
+            self.networks[key] = net.cuda()
 
         for key, criterion in self.criterions.items():
-            self.criterions[key] = criterion.cuda(1)
+            self.criterions[key] = criterion.cuda()
 
         for key, tensor in self.tensors.items():
-            self.tensors[key] = tensor.cuda(1)
+            self.tensors[key] = tensor.cuda()
 
     def save_checkpoint(self, epoch, suffix=''):
         for key, net in self.networks.items():
