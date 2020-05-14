@@ -44,7 +44,7 @@ class AlexNet(nn.Module):
             nn.BatchNorm2d(256),
             nn.ReLU(inplace=True),
         )
-        pool5 = nn.MaxPool2d(kernel_size=3, stride=2)
+        pool5 = nn.MaxPool2d(kernel_size=1, stride=1)
 
         num_pool5_feats = 6 * 6 * 256
         fc_block = nn.Sequential(
