@@ -93,7 +93,7 @@ class GenericDataset(data.Dataset):
             assert(self.split=='ILSVRC2012_img_train' or self.split=='val_folders/val')
             self.mean_pix = [0.485, 0.456, 0.406]
             self.std_pix = [0.229, 0.224, 0.225]
-            crop_size = 32
+            crop_size = 64
 
             if self.split!='ILSVRC2012_img_train':
                 transforms_list = [
