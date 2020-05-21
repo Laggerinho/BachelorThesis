@@ -1,6 +1,8 @@
+import os
+os.environ['CUDA_VISIBLE_DEVICES']='1'
+
 from __future__ import print_function
 import argparse
-import os
 import imp
 import algorithms as alg
 from dataloader import DataLoader, GenericDataset, DataLoaderFE
