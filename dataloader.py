@@ -22,7 +22,7 @@ from pdb import set_trace as breakpoint
 
 # Set the paths of the datasets here.
 _CIFAR_DATASET_DIR = './datasets/CIFAR'
-_IMAGENET_DATASET_DIR = './datasets/IMAGENET/ILSVRC2012'
+_IMAGENET_DATASET_DIR = '/data/cvg/imagenet/ILSVRC2012'
 _PLACES205_DATASET_DIR = './datasets/Places205'
 
 
@@ -77,7 +77,7 @@ class Places205(data.Dataset):
 class GenericDataset(data.Dataset):
     def __init__(self, dataset_name, split, random_sized_crop=False,
                  num_imgs_per_cat=None):
-        self.split = split.lower()
+        self.split = split
         self.dataset_name =  dataset_name.lower()
         self.name = self.dataset_name + '_' + self.split
         self.random_sized_crop = random_sized_crop
@@ -92,11 +92,11 @@ class GenericDataset(data.Dataset):
         self.num_imgs_per_cat = num_imgs_per_cat
 
         if self.dataset_name=='imagenet':
-            assert(self.split=='train' or self.split=='val')
+            assert(self.split=='ILSVRC2012_img_train' or self.split=='val_folders/val')
             self.mean_pix = [0.485, 0.456, 0.406]
             self.std_pix = [0.229, 0.224, 0.225]
 
-            if self.split!='train':
+            if self.split!='ILSVRC2012_img_train':
                 transforms_list = [
                     transforms.Scale(256),
                     transforms.CenterCrop(self.crop_size),
