@@ -12,6 +12,7 @@ parser.add_argument('--checkpoint',  type=int,      default=0,     help='checkpo
 parser.add_argument('--num_workers', type=int,      default=4,     help='number of data loading workers')
 parser.add_argument('--cuda'  ,      type=bool,     default=True,  help='enables cuda')
 parser.add_argument('--disp_step',   type=int,      default=50,    help='display step during training')
+parser.add_argument('--height_img',  type=float,    default=2.,    help='distance of the image to the ')
 args_opt = parser.parse_args()
 
 exp_config_file = os.path.join('.','config',args_opt.exp+'.py')
@@ -62,14 +63,15 @@ dloader_test = DataLoader(
     shuffle=False)
 
 if (data_train_opt['fisheye'] if ('fisheye' in data_train_opt) else False):
-    print('do some fisheye computation in dataloader')
+    # print('do some fisheye computation in dataloader')
     dloader_train = DataLoaderFE(
         dataset=dataset_train,
         batch_size=data_train_opt['batch_size'],
         unsupervised=data_train_opt['unsupervised'],
         epoch_size=data_train_opt['epoch_size'],
         num_workers=args_opt.num_workers,
-        shuffle=True)
+        shuffle=True,
+        height=args_opt.height_img)
 
     dloader_test = DataLoaderFE(
         dataset=dataset_test,
@@ -77,7 +79,8 @@ if (data_train_opt['fisheye'] if ('fisheye' in data_train_opt) else False):
         unsupervised=data_test_opt['unsupervised'],
         epoch_size=data_test_opt['epoch_size'],
         num_workers=args_opt.num_workers,
-        shuffle=False)
+        shuffle=False,
+        height=args_opt.height_img)
 
 config['disp_step'] = args_opt.disp_step
 algorithm = getattr(alg, config['algorithm_type'])(config)

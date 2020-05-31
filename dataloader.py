@@ -16,12 +16,13 @@ import errno
 import numpy as np
 import sys
 import csv
+import math
 
 from pdb import set_trace as breakpoint
 
 # Set the paths of the datasets here.
 _CIFAR_DATASET_DIR = './datasets/CIFAR'
-_IMAGENET_DATASET_DIR = '/data/cvg/imagenet/ILSVRC2012'
+_IMAGENET_DATASET_DIR = './datasets/IMAGENET/ILSVRC2012'
 _PLACES205_DATASET_DIR = './datasets/Places205'
 
 
@@ -76,10 +77,11 @@ class Places205(data.Dataset):
 class GenericDataset(data.Dataset):
     def __init__(self, dataset_name, split, random_sized_crop=False,
                  num_imgs_per_cat=None):
-        self.split = split
+        self.split = split.lower()
         self.dataset_name =  dataset_name.lower()
         self.name = self.dataset_name + '_' + self.split
         self.random_sized_crop = random_sized_crop
+        self.crop_size = 224
 
         # The num_imgs_per_cats input argument specifies the number
         # of training examples per category that would be used.
@@ -90,27 +92,27 @@ class GenericDataset(data.Dataset):
         self.num_imgs_per_cat = num_imgs_per_cat
 
         if self.dataset_name=='imagenet':
-            assert(self.split=='ILSVRC2012_img_train' or self.split=='val_folders/val')
+            assert(self.split=='train' or self.split=='val')
             self.mean_pix = [0.485, 0.456, 0.406]
             self.std_pix = [0.229, 0.224, 0.225]
 
-            if self.split!='ILSVRC2012_img_train':
+            if self.split!='train':
                 transforms_list = [
                     transforms.Scale(256),
-                    transforms.CenterCrop(224),
+                    transforms.CenterCrop(self.crop_size),
                     lambda x: np.asarray(x),
                 ]
             else:
                 if self.random_sized_crop:
                     transforms_list = [
-                        transforms.RandomSizedCrop(224),
+                        transforms.RandomSizedCrop(self.crop_size),
                         transforms.RandomHorizontalFlip(),
                         lambda x: np.asarray(x),
                     ]
                 else:
                     transforms_list = [
                         transforms.Scale(256),
-                        transforms.RandomCrop(224),
+                        transforms.RandomCrop(self.crop_size),
                         transforms.RandomHorizontalFlip(),
                         lambda x: np.asarray(x),
                     ]
@@ -226,7 +228,6 @@ def rotate_img(img, rot):
     else:
         raise ValueError('rotation should be 0, 90, 180, or 270 degrees')
 
-
 class DataLoader(object):
     def __init__(self,
                  dataset,
@@ -241,6 +242,7 @@ class DataLoader(object):
         self.batch_size = batch_size
         self.unsupervised = unsupervised
         self.num_workers = num_workers
+        self.fisheye = False
 
         mean_pix  = self.dataset.mean_pix
         std_pix   = self.dataset.std_pix
@@ -253,6 +255,7 @@ class DataLoader(object):
             lambda x: x.numpy() * 255.0,
             lambda x: x.transpose(1,2,0).astype(np.uint8),
         ])
+        self.dn_obj = Denormalize(mean_pix, std_pix)
 
     def get_iterator(self, epoch=0):
         rand_seed = epoch * self.epoch_size
@@ -310,7 +313,8 @@ class DataLoaderFE(object):
                  unsupervised=True,
                  epoch_size=None,
                  num_workers=0,
-                 shuffle=True):
+                 shuffle=True,
+                 height=1.):
         self.dataset = dataset
         self.shuffle = shuffle
         self.epoch_size = epoch_size if epoch_size is not None else len(dataset)
@@ -318,6 +322,9 @@ class DataLoaderFE(object):
         self.unsupervised = unsupervised
         self.num_workers = num_workers
         self.first_time = True
+        self.grid = None
+        self.height_img = height
+        self.fisheye = True
 
         mean_pix  = self.dataset.mean_pix
         std_pix   = self.dataset.std_pix
@@ -325,6 +332,7 @@ class DataLoaderFE(object):
             transforms.ToTensor(),
             transforms.Normalize(mean=mean_pix, std=std_pix)
         ])
+        self.dn_obj = Denormalize(mean_pix, std_pix)
         self.inv_transform = transforms.Compose([
             Denormalize(mean_pix, std_pix),
             lambda x: x.numpy() * 255.0,
@@ -354,12 +362,15 @@ class DataLoaderFE(object):
                     for a in xrange(img_size):
                         for b in xrange(img_size):
                             # print(b)
-                            x = 5. * (b / 255. - 0.5)
-                            y = 5. * (a / 255. - 0.5)
-                            z = 5.
+                            x = 2. * (b / float(img_size) - 0.5) # 255
+                            y = 2. * (a / float(img_size) - 0.5)
+                            z = self.height_img
 
-                            self.grid[0][a][b][0] = 2.*(x / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.)))
-                            self.grid[0][a][b][1] = 2.*(y / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.)))
+                            self.grid[0][a][b][0] = (x / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.)))
+                            self.grid[0][a][b][1] = (y / ((x ** 2. + y ** 2. + z ** 2.) ** (1. / 2.)))
+
+                    corner = math.fabs(1. / self.grid[0][int(img_size / 2)][0][0])
+                    self.grid = torch.mul(self.grid, corner)
 
                 rotated_imgs = [
                     self.transform(img0),

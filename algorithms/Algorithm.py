@@ -14,6 +14,7 @@ import utils
 import datetime
 import logging
 
+
 from tensorboardX import SummaryWriter
 from pdb import set_trace as breakpoint
 
@@ -36,6 +37,7 @@ class Algorithm():
         self.writer_train_log = 0
         self.writer_eval_run = 0
         self.writer_eval_log = 0
+        self.writer_precision_log_idx = 0
 
         self.keep_best_model_metric_name = opt['best_metric'] if ('best_metric' in opt) else None
 
@@ -251,6 +253,8 @@ class Algorithm():
                 self.logger.info('==> Evaluation stats: %s' % (eval_stats))
                 self.keep_record_of_best_model(eval_stats, self.curr_epoch)
 
+        if data_loader_train.fisheye:
+            self.writer.add_scalar('z_value', data_loader_train.height_img)
         self.writer.export_scalars_to_json("./all_scalars.json")
         self.print_eval_stats_of_best_model()
 
@@ -267,6 +271,10 @@ class Algorithm():
         train_stats = utils.DAverageMeter()
         self.bnumber = len(data_loader())
         for idx, batch in enumerate(tqdm(data_loader(epoch))):
+            if idx == 0:
+                self.writer.add_image('Imageorigin', data_loader.dn_obj(batch[0][0]), epoch)
+                if data_loader.fisheye:
+                    self.writer.add_image('Imagewarped', data_loader.dn_obj(batch[0][4]), epoch)
             self.biter = idx
             train_stats_this = self.train_step(batch)
             if (self.writer_train_run%100 == 0):
@@ -283,7 +291,7 @@ class Algorithm():
     def evaluate(self, dloader):
         self.logger.info('Evaluating: %s' % os.path.basename(self.exp_dir))
 
-	self.dloader = dloader
+        self.dloader = dloader
         self.dataset_eval = dloader.dataset
         self.logger.info('==> Dataset: %s [%d images]' % (dloader.dataset.name, len(dloader)))
         for key, network in self.networks.items():
@@ -302,7 +310,9 @@ class Algorithm():
             eval_stats.update(eval_stats_this)
 
         self.logger.info('==> Results: %s' % eval_stats.average())
-
+        if self.keep_best_model_metric_name is not None:
+            self.writer.add_scalar('data/avg_val ' + str(self.keep_best_model_metric_name), eval_stats.average()[self.keep_best_model_metric_name], self.writer_precision_log_idx)
+        self.writer_precision_log_idx += 1
         return eval_stats.average()
 
     def adjust_learning_rates(self, epoch):
@@ -324,7 +334,7 @@ class Algorithm():
         self.best_epoch = None
 
     def keep_record_of_best_model(self, eval_stats, current_epoch):
-	if self.keep_best_model_metric_name is not None:
+        if self.keep_best_model_metric_name is not None:
             metric_name = self.keep_best_model_metric_name
             if (metric_name not in eval_stats):
                 raise ValueError('The provided metric {0} for keeping the best model is not computed by the evaluation routine.'.format(metric_name))
